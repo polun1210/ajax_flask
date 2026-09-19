@@ -24,12 +24,17 @@
                 <div class="col-4">
                     <input type="number" name="age" id="userAge" class="form-control" placeholder="輸入年紀">
                 </div>
+                <div class="col-4">
+                    <input type="text" name="email" id="userEmail" class="form-control" placeholder="輸入電子郵件">
+                </div>
             </div>
         </form>
         <button id="buttonQuery" class="btn btn-primary mb-3">透過 URL QueryString 傳遞資料</button>
         <button id="buttonPath" class="btn btn-primary mb-3">透過 URL Path 傳遞資料</button>
         <button id="buttonForm" class="btn btn-primary mb-3">資料包在 FormData 中傳遞</button>
         <button id="buttonJson" class="btn btn-primary mb-3">資料包在 JSON 中傳遞 </button>
+        <button id="buttonUpdate" class="btn btn-primary mb-3">修改(PUT)</button>
+        <button id="buttonDelete" class="btn btn-primary mb-3">刪除(DELETE)</button>
 
         <h2 class="display-6 fw-bold text-secondary my-4 pb-2 border-bottom">
             <i class="bi bi-image-fill me-2"></i>上傳圖片
@@ -43,12 +48,45 @@
             <img id="img1" class="img-fluid rounded border shadow-sm" style="width: 300px; height: auto;"
                 src="static/images/empty.png" />
         </div>
+        <hr />
+        <select id="selectCity"></select>
+        <select id="selectDistrict"></select>
+        <select id="selectRoad"></select>
         <div id="divInfo" class="alert alert-info mt-5"></div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
         crossorigin="anonymous"></script>
     <script>
+
+        //IIFE
+
+        (async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/cities')
+
+                if (!response.ok) throw Error("有問題!!")
+
+                const datas = await response.json()
+                console.log(datas);
+                //datas => JSON 物件
+                //讀取JSON資料
+                //資料顯示在網頁上
+                const cities = datas.map(city => `<option value="${city}">${city}</option>`)
+                selCity.innerHTML = cities.join('');
+                loadDistrict();
+                loadRoad();
+
+
+            } catch (err) {
+                console.log(err.message)
+
+            } finally {
+
+
+            }
+        })();
+
         const btnQuery = document.querySelector('#buttonQuery');
         const btnPath = document.querySelector('#buttonPath');
         const btnForm = document.querySelector('#buttonForm');
@@ -57,21 +95,97 @@
         const fileInput = document.querySelector('#fileInput');
         const inpName = document.querySelector('#userName');
         const inpAge = document.querySelector('#userAge');
+        const inpEmail = document.querySelector('#userEmail');
         const frmUser = document.querySelector('#userForm');
 
         const divInfo = document.querySelector('#divInfo');
         const theImg = document.querySelector('#img1');
+        const btnUpdate = document.querySelector('#buttonUpdate');
+        const btnDel = document.querySelector('#buttonDelete');
 
+        const selCity = document.querySelector('#selectCity');
+        const selDist = document.querySelector('#selectDistrict');
+        const selRd = document.querySelector('#selectRoad');
+
+        // 修改
+        btnUpdate.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('Name', 'Yur');
+            formData.append('Email', 'yur@gmail.com');
+            formData.append('Age', 33);
+
+            const apiUrl = 'http://127.0.0.1:5000/api/members/1012';
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                body: formData
+            })
+            const data = await response.json();
+            divInfo.textContent = JSON.stringify(data);
+        })
+
+        //刪除
+        btnDel.addEventListener('click', async () => {
+            const apiUrl = 'http://127.0.0.1:5000/api/members/1013';
+            const response = await fetch(apiUrl, {
+                method: 'DELETE'
+            })
+            const data = await response.json();
+            divInfo.textContent = JSON.stringify(data);
+        })
+
+        // 使用者選取了不同City就會觸發
+        selCity.addEventListener('change', () => {
+            divInfo.textContent = selCity.value;
+            loadDistrict();
+            loadRoad();
+        })
+
+        selDist.addEventListener('change', () => {
+            divInfo.textContent = selDist.value;
+            loadRoad();
+
+        })
+        selRd.addEventListener('change', () => {
+            divInfo.textContent = `${selDist.value}${selRd.value}`;
+
+        })
+
+        // QueryString
         btnQuery.addEventListener('click', async () => {
-
+            const response = await fetch(`http://127.0.0.1:5000/api/demo/query?name=${inpName.value}&age=${inpAge.value}&email=${inpEmail.value}`);
+            const user = await response.json();
+            // console.log(user.name)
+            // console.log(user.age)
+            // console.log(user.email)
+            divInfo.textContent = JSON.stringify(user);
         });
 
+        //Path傳送資料
         btnPath.addEventListener('click', async () => {
-
+            const response = await fetch(`http://127.0.0.1:5000/api/demo/path/${inpName.value}/${inpAge.value}/${inpEmail.value}`)
+            const user = await response.json();
+            divInfo.textContent = JSON.stringify(user);
         });
 
+        //FormData 傳送資料
         btnForm.addEventListener('click', async () => {
+            const formData = new FormData(frmUser);
+            formData.append('Password', '123456') //可用append方法把額外的資料加進去
 
+            const apiUrl = `http://127.0.0.1:5000/api/demo/form`;
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            const datas = await response.json();
+            divInfo.textContent = JSON.stringify(datas);
+
+            //讀取FormData中的資料
+            // for (const pair of formData.entries()) {
+            //     console.log(pair[0]);
+            //     console.log(pair[1]);
+            // }
         });
 
         btnJson.addEventListener('click', async () => {
@@ -79,12 +193,38 @@
                 name: 'Steve',
                 age: 30
             };
+
+            const apiUrl = `http://127.0.0.1:5000/api/demo/json`;
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            const datas = await response.json();
+            divInfo.textContent = JSON.stringify(datas);
         });
 
 
 
         //檔案上傳
         btnUpload.addEventListener('click', async () => {
+            const formData = new FormData();
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('請選擇檔案')
+                return
+            }
+            formData.append('image', file);
+
+            const apiUrl = `http://127.0.0.1:5000/api/demo/image`;
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                body: formData
+            });
+            const datas = await response.json();
+            divInfo.textContent = JSON.stringify(datas);
 
         })
 
@@ -101,6 +241,30 @@
             reader.readAsDataURL(file);  // 將檔案轉為 base64 URI
 
         })
+
+        const loadDistrict = async () => {
+            const apiUrl = `http://127.0.0.1:5000/api/districts?city=${selCity.value}`
+            const response = await fetch(apiUrl)
+            const datas = await response.json()
+            console.log(datas);
+            //datas => JSON 物件
+            //讀取JSON資料
+            //資料顯示在網頁上
+            const sites = datas.map(site => `<option value="${site}">${site}</option>`);
+            selDist.innerHTML = sites.join('');
+        }
+
+        const loadRoad = async () => {
+            const apiUrl = `http://127.0.0.1:5000/api/roads?site_id=${selDist.value}`
+            const response = await fetch(apiUrl)
+            const datas = await response.json()
+            console.log(datas);
+            //datas => JSON 物件
+            //讀取JSON資料
+            //資料顯示在網頁上
+            const roads = datas.map(road => `<option value="${road}">${road}</option>`);
+            selRd.innerHTML = roads.join('');
+        }
     </script>
 </body>
 

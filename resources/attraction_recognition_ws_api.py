@@ -124,7 +124,7 @@ def init_ws(sock):
                         mime_type=mime_type,
                     )
                     stream = client.models.generate_content_stream(
-                        model="gemini-3.6-flash",
+                        model="gemini-3.5-flash-lite",
                         contents=[image_part, PROMPT],
                     )
                     for chunk in stream:

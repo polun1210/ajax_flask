@@ -21,7 +21,7 @@
         <div class="container mt-5">
             <!-- <div class="row justify-content-center"> -->
             <button id="buttonStart" class="btn btn-primary">Ajax 開始</button>
-            <button id="buttonStart" class="btn btn-primary">Ajax 結束</button>
+            <button id="buttonEnd" class="btn btn-primary">Ajax 結束</button>
             <img id="img1" src="static/images/Loading.gif" style="display: none;" alt="載入中..." />
 
 
@@ -31,6 +31,110 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+
+        const apiUrl = 'http://127.0.0.1:5000/api/hello';
+        // ====== async await ======
+        // 步驟1 找到要控制的標籤   
+        const btnStart = document.querySelector('#buttonStart');
+        const btnEnd = document.querySelector('#buttonEnd');
+        const div1 = document.querySelector('#divInfo');
+        const imgLoading = document.querySelector('#img1');
+
+
+        let abortController; //宣告變數
+
+        btnEnd.addEventListener('click', () => {
+            if (abortController) {
+                abortController.abort(); //停止api呼叫
+            }
+
+        })
+
+
+        // 步驟2 何時做 -> 事件 (click 按下按鈕)
+        btnStart.addEventListener('click', async () => {
+            //步驟3 呼叫api -> 要做甚麼
+            try {
+                //建立abortController 物件
+                abortController = new AbortController();
+                const signal = abortController.signal;
+
+                imgLoading.style.display = 'inline'; //顯示執行中圖示 (按下按鈕)
+                btnStart.disabled = true; //停用按鈕功能 
+
+                const response = await fetch(apiUrl, { signal }); //response物件 => header + body  {'signal':signal} => {'key': value}
+                if (!response.ok) throw new Error('API 呼叫錯誤')
+
+                const data = await response.json();
+                div1.innerHTML = `<h2>${data.message}</h2>`
+
+            } catch (error) {
+                let message = error.message;
+                if (error.name === 'AbortError') {
+                    message = "你停止了程式的執行"
+                }
+
+                div1.innerHTML = `錯誤訊息: ${message}`
+
+            } finally {
+                imgLoading.style.display = 'none';
+                btnStart.disabled = false;
+            }
+        })
+
+
+
+        //     const response = await fetch(apiUrl); // Response => Header + Body
+        // })
+        // if (response.ok) {
+        //     const data = await response.json(); // 從Response Body 取出JSON資料
+
+        //     // 讀出JSON資料顯示在網頁上
+        //     div1.innerHTML = `<h2>${data.message}</h2>`;
+        // }
+        // else {
+        //     if (response.status == '404') {
+        //         alert('找不到API')
+        //     }
+        //     else if (response.status == '403') {
+        //         alert('禁止存取')
+        //     }
+        //     else {
+        //         alert("有錯!")
+        //     }
+        // }
+
+
+
+        // ====== promise response 作法 =======
+        // 步驟1 找到要控制的標籤   
+        // const btnStart = document.querySelector('#buttonStart');
+        // // 步驟2 何時做 -> 事件 (click 按下按鈕)
+        // btnStart.addEventListener('click', () => {
+        //     // 步驟3 事件發生後做甚麼
+        //     // 呼叫 API
+        //     // console.log(fetch(apiUrl));  // fetch(url)得到的是一個Promise物件
+        //     // fetch(apiUrl)
+        //     //     .then((response) => {
+        //     //         console.log(response);
+        //     //         console.log(response.ok);
+        //     //         console.log(response.status);
+        //     //         console.log(response.headers.get('content-type'));
+        //     //         console.log(response.headers.get('content-length'));
+        //     //         return response.json(); // 要從response body 取出JSON資料
+        //     //     })
+        //     //     .then((data) => {
+        //     //         console.log(data);
+        //     //         console.log(data.message);
+        //     //     })
+
+        //     fetch(apiUrl)
+        //         .then(response => response.json())
+        //         .then(data => console.log(data.message));
+
+        // })
+
+
 
         //想想看蛋、咖啡、吐司印出的順序與時間
 
@@ -96,7 +200,7 @@
         //     })
 
 
-        //aync/await 寫法
+        //async/await 寫法
         // async function demo5() {
         //     let data = await printSomething("蛋");
         //     console.log(data);

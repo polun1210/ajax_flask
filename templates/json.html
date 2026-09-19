@@ -19,6 +19,9 @@
     {% include '_navbar.html' %}
     <div class="container mt-3">
         <h3>JSON 練習</h3>
+
+        <button id="button1">Load Data</button>
+
         <div id="userList">
 
         </div>
@@ -33,7 +36,58 @@
                 { "id": 2, "UserName": "Bob", "UserEmail": "bob@company.com", "age": 34 },
                 { "id": 3, "UserName": "Charlie", "UserEmail": "charlie@company.com", "age": 22 }]
 
+            const btn = document.querySelector("#button1");
+            const divUser = document.querySelector("#userList");
+            btn.addEventListener('click', () => {
+                // bin.textContent = "loading...";
+                // bin.style.backgroundColor = "yellow";
 
+                // 讀取Json資料
+                // [] array 陣列 [index]
+                // console.log(users[0]) -> 整個陣列 { "id": 1, "UserName": "Alice", "UserEmail": "alice@company.com", "age": 28 }
+
+                // {} object 物件 {key:value} -> obj.key => value
+                // console.log(users[0].UserName)
+
+                // 讀Bob這筆資料
+                // console.log(users[1].id);
+                // console.log(users[1].UserName);
+                // console.log(users[1].UserEmail);
+                // console.log(users[1].age);
+
+                // users.forEach((user) => {
+                // console.log(user.id);
+                // console.log(user.UserName);
+                // console.log(user.UserEmail);
+                // console.log(user.age);
+
+                const userTable = users.map((user) => {
+                    return (`
+                            <tr>
+                                <td>${user.id}</td>
+                                <td>${user.UserName}</td>
+                                <td>${user.UserEmail}</td>
+                                <td>${user.age}</td>
+                            </tr>
+                            `)
+                })
+
+                divUser.innerHTML = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Age</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${userTable.join('')}
+                        </tbody>
+                    </table>
+                `;
+            })
 
 
         </script>

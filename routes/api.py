@@ -48,8 +48,8 @@ api.add_resource(RoadResource, '/roads')
 
 
 api.add_resource(QueryStringDemo, '/demo/query')
-# http://127.0.0.1:5000/api/demo/path/John/25
-api.add_resource(PathDemo, '/demo/path/<string:name>/<int:age>')
+# http://127.0.0.1:5000/api/demo/path/John/25/john@gmail.com
+api.add_resource(PathDemo, '/demo/path/<string:name>/<int:age>/<string:email>')
 api.add_resource(FormDataDemo, '/demo/form')
 api.add_resource(JsonDemo, '/demo/json')  
 api.add_resource(ImageUploadDemo, '/demo/image')  

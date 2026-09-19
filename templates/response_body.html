@@ -36,6 +36,9 @@
                 JSON處理
             </h3>
             <button id="buttonJson" class="btn btn-primary">讀取JSON</button>
+            <select id="selTask">
+
+            </select>
             <div class="mt-3">
                 <img id="img1" class="img-fluid rounded border shadow-sm" style="width: 300px; height: auto;"
                     src="static/images/empty.png" />
@@ -56,19 +59,37 @@
         const btnJson = document.querySelector('#buttonJson');
         const divInfo = document.querySelector('#divInfo');
         const theImg = document.querySelector('#img1');
+        const selTask = document.querySelector('#selTask');
 
 
         btnText.addEventListener('click', async () => {
-
+            const apiUrl = 'http://127.0.0.1:5000/api/text';
+            const response = await fetch(apiUrl);
+            const data = await response.text(); //API回傳的是文字，透過text()
+            divInfo.textContent = data;
         });
 
 
         btnLoad.addEventListener('click', async () => {
+            const apiUrl = 'http://127.0.0.1:5000/api/image';
+            const response = await fetch(apiUrl);
+            const datas = await response.blob(); // API回傳的是圖片，透過blob()
+            theImg.src = URL.createObjectURL(datas); // 只更換theImg.src的圖片路徑，使用URL套件的createObjectURL方法
 
         })
 
 
         btnJson.addEventListener('click', async () => {
+            const apiUrl = 'http://127.0.0.1:5000/api/json';
+            const response = await fetch(apiUrl);
+            const datas = await response.json(); //API回傳的是Json，透過json()
+
+            // datas = [] 陣列array -> 用索引質 index
+            const tasks = datas.map((task) => `<option value="4{task.id}">${task.task}</option>`);
+
+            selTask.innerHTML = tasks.join("");
+
+            divInfo.textContent = JSON.stringify(datas); // JSON.stringify => 把JSON物件轉JSON字串
 
         });
 

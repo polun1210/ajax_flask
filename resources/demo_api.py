@@ -7,23 +7,25 @@ class QueryStringDemo(Resource):
     def get(self):
         # 使用 request.args 取得資料
         name = request.args.get('name', '預設值')
-        age = request.args.get('age')
-        return {"method": "QueryString", "name": name, "age": age}, 200
+        age = request.args.get('age', 20)
+        email = request.args.get('email')
+        return {"method": "QueryString", "name": name, "age": age, "email": email}, 200
 
 class PathDemo(Resource):
-    def get(self, name, age): # 變數會直接作為參數傳入
-        return {"method": "PathParameter", "name": name, "age": age}, 200
+    def get(self, name, age, email): # 變數會直接作為參數傳入
+        return {"method": "PathParameter", "name": name, "age": age, "email": email}, 200
     
 class FormDataDemo(Resource):
     def post(self):
         # 接收一般文字欄位
         name = request.form.get('name')
         age = request.form.get('age')
+        email = request.form.get('email')
         
         # 如果有上傳檔案，使用 request.files
         # file = request.files.get('photo')
         
-        return {"method": "FormData", "received": {"name": name, "age": age}}, 201
+        return {"method": "FormData", "received": {"name": name, "age": age, "email":email}}, 201
 
 class JsonDemo(Resource):
     def post(self):

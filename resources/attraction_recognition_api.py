@@ -67,7 +67,7 @@ class AttractionImageRecognition(Resource):
             )
             # 呼叫 Gemini API 進行景點辨識
             response = client.models.generate_content(
-                model="gemini-3.6-flash",
+                model="gemini-3.5-flash-lite",
                 # 組合送給模型的內容：圖片 + 文字提示（prompt）
                 contents=[
                     image_part,
